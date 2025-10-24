@@ -31,7 +31,7 @@ namespace StudentADO.BusinessLogic
             return user != null ? MapToUserDTO(user) : null;
         }
 
-        // Update user
+        // Update user - FIXED VERSION
         public async Task<(bool success, string message)> UpdateUserAsync(int userId, UpdateUserDTO updateDto)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -41,10 +41,26 @@ namespace StudentADO.BusinessLogic
                 return (false, "User not found");
             }
 
-            // Update only provided fields
+            // Check if email is being changed and already exists
+            if (!string.IsNullOrEmpty(updateDto.Email) && updateDto.Email != user.Email)
+            {
+                var existingUser = await _userRepository.GetByEmailAsync(updateDto.Email);
+                if (existingUser != null && existingUser.UserId != userId)
+                {
+                    return (false, "Email already exists");
+                }
+                user.Email = updateDto.Email;
+            }
+
+            // Update all provided fields
             if (!string.IsNullOrEmpty(updateDto.Name))
             {
                 user.Name = updateDto.Name;
+            }
+
+            if (!string.IsNullOrEmpty(updateDto.Designation))
+            {
+                user.Designation = updateDto.Designation;
             }
 
             if (updateDto.DateOfBirth.HasValue)

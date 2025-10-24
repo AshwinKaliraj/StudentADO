@@ -13,14 +13,22 @@ namespace StudentADO.Tests
     public class AuthenticationLogicTests
     {
         private readonly Mock<IUserRepository> _mockRepo;
-        private readonly Mock<JwtHelper> _mockJwtHelper;
         private readonly AuthenticationLogic _authLogic;
 
         public AuthenticationLogicTests()
         {
             _mockRepo = new Mock<IUserRepository>();
-            _mockJwtHelper = new Mock<JwtHelper>("testkey123456789012345678901234", "TestIssuer", "TestAudience", 60);
-            _authLogic = new AuthenticationLogic(_mockRepo.Object, _mockJwtHelper.Object);
+
+            // Use a fake/stub JwtHelper for testing
+            // We're only testing login logic, not JWT generation
+            var jwtHelper = new JwtHelper(
+                "ThisIsAVeryLongAndSecureSecretKeyForJWTTokenGenerationTesting1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                "TestIssuer",
+                "TestAudience",
+                60
+            );
+
+            _authLogic = new AuthenticationLogic(_mockRepo.Object, jwtHelper);
         }
 
         [Fact]
@@ -117,8 +125,6 @@ namespace StudentADO.Tests
             };
 
             _mockRepo.Setup(r => r.GetByEmailAsync(loginDto.Email)).ReturnsAsync(user);
-            _mockJwtHelper.Setup(j => j.GenerateToken(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
-                          .Returns("fake-jwt-token");
 
             // Act
             var (success, message, response) = await _authLogic.LoginAsync(loginDto);
@@ -127,7 +133,15 @@ namespace StudentADO.Tests
             Assert.True(success);
             Assert.Equal("Login successful", message);
             Assert.NotNull(response);
-            Assert.Equal("fake-jwt-token", response.Token);
+
+            // Verify response contains expected user data
+            Assert.Equal(user.Email, response.Email);
+            Assert.Equal(user.Designation, response.Designation);
+            Assert.Equal(user.Name, response.Name);
+
+            // Verify token was generated (just check it exists, not the content)
+            Assert.NotNull(response.Token);
+            Assert.NotEmpty(response.Token);
         }
 
         [Fact]

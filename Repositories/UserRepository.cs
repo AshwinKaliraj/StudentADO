@@ -1,7 +1,6 @@
 ﻿using StudentADO.Models;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -16,7 +15,6 @@ namespace StudentADO.Repositories
             _connectionString = connectionString;
         }
 
-        // Get user by ID
         public async Task<User> GetByIdAsync(int userId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -37,7 +35,6 @@ namespace StudentADO.Repositories
             return null;
         }
 
-        // Get user by email (for login)
         public async Task<User> GetByEmailAsync(string email)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -58,7 +55,6 @@ namespace StudentADO.Repositories
             return null;
         }
 
-        // Get all users
         public async Task<List<User>> GetAllAsync()
         {
             List<User> users = new List<User>();
@@ -80,7 +76,6 @@ namespace StudentADO.Repositories
             return users;
         }
 
-        // Create new user
         public async Task<int> CreateAsync(User user)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -103,28 +98,35 @@ namespace StudentADO.Repositories
             }
         }
 
-        // Update user
         public async Task<bool> UpdateAsync(User user)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"UPDATE Users 
-                                 SET Name = @Name, DateOfBirth = @DateOfBirth, UpdatedAt = @UpdatedAt 
+                                 SET Name = @Name, 
+                                     Email = @Email,
+                                     DateOfBirth = @DateOfBirth, 
+                                     Designation = @Designation,
+                                     UpdatedAt = @UpdatedAt 
                                  WHERE UserId = @UserId";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@UserId", user.UserId);
                 cmd.Parameters.AddWithValue("@Name", user.Name);
+                cmd.Parameters.AddWithValue("@Email", user.Email);
                 cmd.Parameters.AddWithValue("@DateOfBirth", user.DateOfBirth);
+                cmd.Parameters.AddWithValue("@Designation", user.Designation);
                 cmd.Parameters.AddWithValue("@UpdatedAt", DateTime.UtcNow);
 
                 await conn.OpenAsync();
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                Console.WriteLine($"[UPDATE] UserId: {user.UserId}, Rows Affected: {rowsAffected}");
+
                 return rowsAffected > 0;
             }
         }
 
-        // Delete user
         public async Task<bool> DeleteAsync(int userId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -139,7 +141,6 @@ namespace StudentADO.Repositories
             }
         }
 
-        // Check if email exists
         public async Task<bool> EmailExistsAsync(string email)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -154,7 +155,6 @@ namespace StudentADO.Repositories
             }
         }
 
-        // Helper method to map SqlDataReader to User object
         private User MapToUser(SqlDataReader reader)
         {
             return new User

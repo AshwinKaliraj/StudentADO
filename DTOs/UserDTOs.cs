@@ -15,11 +15,15 @@ namespace StudentADO.DTOs
     }
 
     // Update User Request
-    public class UpdateUserDTO
+    namespace StudentADO.DTOs
     {
-        [StringLength(100)]
-        public string Name { get; set; }
-
-        public DateTime? DateOfBirth { get; set; }
+        public class UpdateUserDTO
+        {
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public string Designation { get; set; }
+            public DateTime? DateOfBirth { get; set; }
+        }
     }
+
 }

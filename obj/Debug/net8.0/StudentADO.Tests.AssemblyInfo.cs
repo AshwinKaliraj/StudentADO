@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StudentADO.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7dac8fa564ce75200a35a8a0810f9066fb5b8d3d")]
 [assembly: System.Reflection.AssemblyProductAttribute("StudentADO.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StudentADO.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
